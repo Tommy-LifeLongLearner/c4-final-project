@@ -51,6 +51,10 @@ functions:
   # Provide iamRoleStatements property for performing Actions on DynamoDB
   GetTodos:
     handler: src/lambda/http/getTodos.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action: dynamodb:Query        
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
     events:
       - http:
           method: get
@@ -64,6 +68,10 @@ functions:
   # To validate incoming HTTP requests, we have provided the request schemas in function definition below. 
   # CreateTodo:
   #   handler: src/lambda/http/createTodo.handler
+  #   iamRoleStatements:
+  #     - Effect: "Allow"        
+  #       Action: dynamodb:PutItem      
+  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
   #   events:
   #     - http:
   #         method: post
@@ -101,8 +109,8 @@ functions:
   #         method: post
   #         path: todos/{todoId}/attachment
 
-# resources:
-#   Resources:
+resources:
+  Resources:
 #     # Add necessary AWS resources. You will need at least the following AWS resources
 #     # TODO: Fill the properties
 #     # Feel free to change the names as you like. 
@@ -111,9 +119,32 @@ functions:
 #       Properties:
     
 #     # TODO: Create a DynamoDB table with local secondary index and a composite key
-#     TodosTable:
-#       Type: AWS::DynamoDB::Table
-#       Properties:
+      TodosTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+          AttributeDefinitions:
+            - AttributeName: userId
+              AttributeType: S
+            - AttributeName: todoId
+              AttributeType: S
+            - AttributeName: createdAt
+              AttributeType: S
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            - AttributeName: todoId
+              KeyType: RANGE
+          BillingMode: PAY_PER_REQUEST
+          TableName: ${self:provider.environment.TODOS_TABLE}
+          LocalSecondaryIndexes:
+            - IndexName: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
+              KeySchema:
+                - AttributeName: userId
+                  KeyType: HASH
+                - AttributeName: createdAt
+                  KeyType: RANGE
+              Projection:
+                ProjectionType: ALL # What attributes will be copied to an index
 
 #     # TODO: Complete the bucket properties below. 
 #     # Do not forget to add the CorsConfiguration propoerty
