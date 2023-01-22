@@ -59,5 +59,26 @@ export class TodosAccess {
         }
       });
     }
-  }  
+  }
+
+  async deleteTodo(userId: string, todoId: string) {
+    try {
+      await this.client.delete({
+        TableName: todosTable,
+        Key: {
+          userId,
+          todoId
+        }
+      }).promise();
+    }catch(err) {
+      logger.error({
+        func: "TodosAccess.deleteTodo",
+        err: err.message,
+        params: {
+          todoId,
+          userId
+        }
+      });
+    }
+  }
 }
