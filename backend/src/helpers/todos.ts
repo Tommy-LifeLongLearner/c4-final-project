@@ -1,5 +1,5 @@
 import { TodosAccess } from './todosAcess'
-// import { AttachmentUtils } from './attachmentUtils';
+import { generateSignedURL } from './attachmentUtils';
 // import { TodoItem } from '../models/TodoItem'
 // import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 // import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
@@ -35,4 +35,8 @@ export const deleteTodo = async(userId: string, todoId: string) => {
 
 export const updateTodo = async(updatedData, userId: string, todoId: string) => {
   await todosAccess.updateTodo(updatedData, userId, todoId);
+}
+
+export const createAttachmentPresignedUrl = async(userId: string, todoId: string) => {
+  return generateSignedURL(userId, todoId);
 }
