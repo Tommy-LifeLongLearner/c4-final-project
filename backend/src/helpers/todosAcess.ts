@@ -41,4 +41,23 @@ export class TodosAccess {
       });
     }
   }
+
+  async createTodo(newItem): Promise<TodoItem> {
+    try {
+      await this.client.put({
+        TableName: todosTable,
+        Item: newItem
+      }).promise();
+  
+      return newItem;
+    }catch(err) {
+      logger.error({
+        func: "TodosAccess.createTodo",
+        err: err.message,
+        params: {
+          newItem
+        }
+      });
+    }
+  }  
 }
