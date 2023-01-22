@@ -2,7 +2,7 @@ import * as AWS from 'aws-sdk'
 import * as AWSXRay from 'aws-xray-sdk'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
-// import { TodoUpdate } from '../models/TodoUpdate';
+import { TodoUpdate } from '../models/TodoUpdate';
 
 const XAWS = AWSXRay.captureAWS(AWS)
 const todosTable = process.env.TODOS_TABLE;
@@ -77,6 +77,39 @@ export class TodosAccess {
         params: {
           todoId,
           userId
+        }
+      });
+    }
+  }
+
+  async updateTodo(updatedData: TodoUpdate, userId: string, todoId: string) {
+    try {
+      await this.client.update({
+        TableName: todosTable,
+        ExpressionAttributeNames: {
+          "#N": "name", 
+          "#DD": "dueDate",
+          "#D": "done"
+        },
+        ExpressionAttributeValues: {
+          ":n": updatedData.name, 
+          ":dd": updatedData.dueDate,
+          ":d": updatedData.done
+        },
+        UpdateExpression: "SET #N = :n, #DD = :dd, #D = :d",
+        Key: {
+          userId,
+          todoId
+        }
+      }).promise();
+    }catch(err) {
+      logger.error({
+        func: "TodosAccess.updateTodo",
+        err: err.message,
+        params: {
+          todoId,
+          userId,
+          updatedData
         }
       });
     }

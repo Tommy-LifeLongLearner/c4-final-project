@@ -30,5 +30,9 @@ export const createTodo = async(newTodo, userId: string) => {
 }
 
 export const deleteTodo = async(userId: string, todoId: string) => {
-  return await todosAccess.deleteTodo(userId, todoId);
+  await todosAccess.deleteTodo(userId, todoId);
+}
+
+export const updateTodo = async(updatedData, userId: string, todoId: string) => {
+  await todosAccess.updateTodo(updatedData, userId, todoId);
 }
